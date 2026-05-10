@@ -1129,6 +1129,9 @@ async function runAIAnalysis(){
   // Restore key from session if available
   if(!window.LDP_API_KEY) window.LDP_API_KEY = sessionStorage.getItem('ldp_key')||'';
 
+  // Proxy is live — use it
+  window.LDP_PROXY_URL = 'https://ldp-proxy.vercel.app/api/scan';
+
   // If still no key, show the prompt
   if(!window.LDP_API_KEY && !window.LDP_PROXY_URL){showApiKeyPrompt();return;}
   const btn=document.getElementById('analyze-btn');
@@ -1168,7 +1171,7 @@ Include exactly 6 suggestions. Every program must appear in exactly one tier.`;
       method:'POST',
       headers,
       body:JSON.stringify({
-        model:'claude-sonnet-4-5-20251001',
+        model:'claude-haiku-4-5-20251001',
         max_tokens:3000,
         system:sys,
         messages:[{role:'user',content:usr}]
