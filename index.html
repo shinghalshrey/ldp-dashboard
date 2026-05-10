@@ -1125,6 +1125,12 @@ uzEl.addEventListener('drop',e=>{
 async function runAIAnalysis(){
   if(!isUnlocked){document.getElementById('paywall-overlay').classList.add('open');return;}
   if(!resumeText){alert('Please upload your resume first.');return;}
+
+  // Restore key from session if available
+  if(!window.LDP_API_KEY) window.LDP_API_KEY = sessionStorage.getItem('ldp_key')||'';
+
+  // If still no key, show the prompt
+  if(!window.LDP_API_KEY && !window.LDP_PROXY_URL){showApiKeyPrompt();return;}
   const btn=document.getElementById('analyze-btn');
   btn.disabled=true;btn.textContent='Analysing...';
   document.getElementById('ai-results').innerHTML=`<div class="spin-wrap"><div class="spinner"></div><div class="spin-label">Matching your profile against ${progs.length} LDP programs...</div></div>`;
@@ -1151,18 +1157,18 @@ Include exactly 6 suggestions. Every program must appear in exactly one tier.`;
   const DIRECT_URL = 'https://api.anthropic.com/v1/messages';
 
   const makeRequest = async (url, useProxy) => {
-    const headers = {'Content-Type':'application/json'};
-    if(!useProxy){
-      // Direct call — works in local file:// or if CORS is resolved
-      headers['x-api-key'] = window.LDP_API_KEY || '';
-      headers['anthropic-version'] = '2023-06-01';
-      headers['anthropic-dangerous-direct-browser-access'] = 'true';
-    }
+    const key = window.LDP_API_KEY || '';
+    const headers = {
+      'Content-Type':'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    };
     return fetch(url, {
       method:'POST',
       headers,
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-5-20251001',
         max_tokens:3000,
         system:sys,
         messages:[{role:'user',content:usr}]
@@ -1232,8 +1238,9 @@ function setApiKey(){
   const key=document.getElementById('api-key-input').value.trim();
   if(!key||!key.startsWith('sk-')){alert('Please enter a valid Anthropic API key (starts with sk-)');return;}
   window.LDP_API_KEY=key;
-  toast('Key saved for this session ✓');
-  runAIAnalysis();
+  sessionStorage.setItem('ldp_key',key);
+  toast('Key saved ✓ — running analysis...');
+  setTimeout(()=>runAIAnalysis(),300);
 }
 
 function renderAIResults(result){
