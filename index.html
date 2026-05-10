@@ -275,6 +275,44 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .empty{text-align:center;padding:40px 24px;color:var(--text3);font-size:13px;font-style:italic}
 .toast{position:fixed;bottom:22px;right:22px;background:var(--text);color:var(--bg2);padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:300;transform:translateY(50px);opacity:0;transition:all .2s;pointer-events:none}
 .toast.show{transform:translateY(0);opacity:1}
+
+/* ONBOARDING MODAL */
+.onboard-overlay{position:fixed;inset:0;background:rgba(24,24,15,0.7);z-index:600;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.onboard-overlay.open{display:flex}
+.onboard-box{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:40px;width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
+.ob-logo{width:48px;height:48px;background:linear-gradient(135deg,#1d6a45,#0f4530);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:20px}
+.ob-title{font-family:var(--serif);font-size:24px;font-weight:400;font-style:italic;margin-bottom:6px;letter-spacing:-0.3px}
+.ob-sub{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:24px}
+.ob-field{margin-bottom:16px}
+.ob-field label{display:block;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.ob-field input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 13px;font-size:13px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color .12s}
+.ob-field input:focus{border-color:var(--accent);background:var(--bg2)}
+.ob-schools{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.ob-school-btn{font-size:12px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:var(--sans);transition:all .12s;font-weight:500}
+.ob-school-btn.sel{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.ob-cta{width:100%;background:linear-gradient(135deg,#1d6a45,#0f4530);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .15s;margin-top:8px}
+.ob-cta:hover{opacity:.9;transform:translateY(-1px)}
+.ob-skip{display:block;text-align:center;font-size:11px;color:var(--text3);cursor:pointer;background:none;border:none;font-family:var(--sans);margin-top:12px;text-decoration:underline}
+.ob-skip:hover{color:var(--text2)}
+
+/* UPDATED ALUMNI SEARCH CARDS */
+.ali-search-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:24px}
+.ali-search-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.ali-sc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.ali-sc-name{font-size:13px;font-weight:500;line-height:1.3}
+.ali-sc-org{font-size:11px;color:var(--text2);margin-top:1px}
+.ali-sc-school-badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.ali-sc-links{display:flex;gap:5px;flex-wrap:wrap}
+.ali-sc-links a{font-size:11px;padding:5px 10px;border-radius:6px;background:var(--blue-bg);border:1px solid rgba(26,79,168,.2);color:var(--blue);cursor:pointer;text-decoration:none;font-family:var(--sans);display:inline-block;transition:all .12s;white-space:nowrap}
+.ali-sc-links a:hover{background:var(--blue);color:#fff}
+.ali-sc-tip{font-size:10px;color:var(--text3);margin-top:7px;line-height:1.5;font-style:italic}
+.ali-section-hd{font-family:var(--serif);font-size:16px;font-weight:400;margin-bottom:12px;margin-top:4px;color:var(--text)}
+.ali-section-sub{font-size:11px;color:var(--text3);margin-top:2px;margin-bottom:14px}
+
+/* ICS / REMINDER BUTTON */
+.ics-btn{font-size:10px;padding:4px 10px;border-radius:6px;border:1px solid rgba(13,107,107,.25);background:var(--teal-bg);color:var(--teal);cursor:pointer;font-family:var(--sans);transition:all .1s;white-space:nowrap}
+.ics-btn:hover{background:var(--teal);color:#fff}
+.dlitem-actions{display:flex;gap:6px;margin-left:auto;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -297,6 +335,42 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     </div>
     <button class="pw-cta" onclick="unlockApp()">Pay €5 &amp; Get Full Access →</button><br>
     <button class="pw-skip" onclick="dismissPaywall()">Continue without AI features</button>
+  </div>
+</div>
+
+<!-- ONBOARDING MODAL -->
+<div class="onboard-overlay" id="onboard-overlay">
+  <div class="onboard-box">
+    <div class="ob-logo">🎓</div>
+    <div class="ob-title">Welcome to LDP Scout</div>
+    <div class="ob-sub">Tell us a little about yourself — we'll personalise your alumni search and deadline reminders. Takes 30 seconds.</div>
+    <div class="ob-field">
+      <label>Your Name</label>
+      <input id="ob-name" placeholder="e.g. Shrey Singhal" autocomplete="name">
+    </div>
+    <div class="ob-field">
+      <label>Email (for calendar reminders)</label>
+      <input id="ob-email" type="email" placeholder="you@school.edu" autocomplete="email">
+    </div>
+    <div class="ob-field">
+      <label>Your MBA School(s) — select all that apply</label>
+      <div class="ob-schools" id="ob-schools">
+        <button class="ob-school-btn" data-school="esade" onclick="toggleSchool(this)">ESADE</button>
+        <button class="ob-school-btn" data-school="hec" onclick="toggleSchool(this)">HEC Paris</button>
+        <button class="ob-school-btn" data-school="insead" onclick="toggleSchool(this)">INSEAD</button>
+        <button class="ob-school-btn" data-school="lbs" onclick="toggleSchool(this)">LBS</button>
+        <button class="ob-school-btn" data-school="iese" onclick="toggleSchool(this)">IESE</button>
+        <button class="ob-school-btn" data-school="ie" onclick="toggleSchool(this)">IE</button>
+        <button class="ob-school-btn" data-school="oxford" onclick="toggleSchool(this)">Oxford Saïd</button>
+        <button class="ob-school-btn" data-school="cambridge" onclick="toggleSchool(this)">Cambridge Judge</button>
+        <button class="ob-school-btn" data-school="bocconi" onclick="toggleSchool(this)">SDA Bocconi</button>
+        <button class="ob-school-btn" data-school="mannheim" onclick="toggleSchool(this)">Mannheim</button>
+        <button class="ob-school-btn" data-school="wbs" onclick="toggleSchool(this)">Warwick</button>
+        <button class="ob-school-btn" data-school="other" onclick="toggleSchool(this)">Other</button>
+      </div>
+    </div>
+    <button class="ob-cta" onclick="saveOnboarding()">Set Up My Dashboard →</button>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip for now</button>
   </div>
 </div>
 
@@ -366,24 +440,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 
 <!-- ALUMNI PAGE -->
 <div class="page" id="page-alumni">
-  <div class="sech"><h2>Alumni Network</h2><p>ESADE &amp; HEC Paris alumni inside target LDP firms — build relationships before applications open</p></div>
-  <div class="itip"><strong>How to use:</strong> Each "Search LinkedIn →" button opens your school's alumni directory pre-filtered by company keyword. You must be logged into LinkedIn. Find real alumni, then click "+ Add Contact" to track your outreach here. Aim to reach out 6–8 weeks before a program opens.</div>
-  <div class="filter-row" style="margin-bottom:16px">
-    <input class="si-input" id="alumni-search" type="text" placeholder="Search name, firm, or program..." oninput="renderAlumni()">
-    <div class="divider"></div>
-    <span class="flabel">School</span>
-    <button class="fpill on" data-asc="all"   onclick="setF('asc',this)">All</button>
-    <button class="fpill"    data-asc="esade" onclick="setF('asc',this)">ESADE</button>
-    <button class="fpill"    data-asc="hec"   onclick="setF('asc',this)">HEC Paris</button>
-    <div class="divider"></div>
-    <span class="flabel">Status</span>
-    <button class="fpill on" data-ast="all"        onclick="setF('ast',this)">All</button>
-    <button class="fpill"    data-ast="identified" onclick="setF('ast',this)">Identified</button>
-    <button class="fpill"    data-ast="reached"    onclick="setF('ast',this)">Reached</button>
-    <button class="fpill"    data-ast="replied"    onclick="setF('ast',this)">Replied</button>
-    <button class="fpill"    data-ast="coffee"     onclick="setF('ast',this)">Coffee chat</button>
-    <div class="spacer"></div>
-    <button class="add-btn" onclick="openM('alumni')">+ Add Contact</button>
+  <div class="sech"><h2>Alumni Network</h2><p id="alumni-sub">Find alumni inside target LDP firms — build relationships before applications open</p></div>
+  <div class="itip" id="alumni-tip"><strong>How to use:</strong> Click any LinkedIn button below to search your school's alumni directory filtered by that company + program. Log contacts you find using "+ Add Contact". Aim to reach out 6–8 weeks before a program opens.</div>
+
+  <!-- DYNAMIC SEARCH SECTION -->
+  <div style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="ali-section-hd" style="margin:0">LinkedIn Alumni Search</div>
+      <div style="flex:1;min-width:160px">
+        <input class="si-input" id="alumni-prog-search" type="text" placeholder="Filter programs (e.g. Siemens, Finance, Roche...)" oninput="renderAlumniSearch()" style="width:100%">
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="alumni-school-pills"></div>
+    </div>
+    <div class="ali-search-grid" id="alumni-search-cards"></div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div style="border-top:1px solid var(--border);margin:24px 0 20px"></div>
+
+  <!-- MANUAL TRACKER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div class="ali-section-hd" style="margin:0">My Contact Tracker</div>
+      <div class="ali-section-sub">People you've identified, reached out to, or spoken with</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input class="si-input" id="alumni-search" type="text" placeholder="Search name, firm, program..." oninput="renderAlumni()" style="min-width:200px">
+      <span class="flabel">Status</span>
+      <button class="fpill on" data-ast="all"        onclick="setF('ast',this)">All</button>
+      <button class="fpill"    data-ast="identified" onclick="setF('ast',this)">Identified</button>
+      <button class="fpill"    data-ast="reached"    onclick="setF('ast',this)">Reached</button>
+      <button class="fpill"    data-ast="replied"    onclick="setF('ast',this)">Replied</button>
+      <button class="fpill"    data-ast="coffee"     onclick="setF('ast',this)">Coffee chat</button>
+      <button class="add-btn" onclick="openM('alumni')">+ Add Contact</button>
+    </div>
   </div>
   <div class="agrid" id="alumni-list"></div>
 </div>
@@ -401,7 +491,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 
 <!-- DEADLINES PAGE -->
 <div class="page" id="page-deadlines">
-  <div class="sech"><h2>Upcoming Deadlines</h2><p>Sorted by urgency — act on red first</p></div>
+  <div class="sech"><h2>Upcoming Deadlines</h2><p>Sorted by urgency — act on red first. Click 📅 to add a reminder to your calendar.</p></div>
   <div class="dllist" id="dl-list"></div>
 </div>
 
@@ -470,7 +560,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
   <div class="mtitle">Add Alumni Contact</div>
   <div class="fgrid">
     <div class="fg"><label>Full Name</label><input id="ai-name" placeholder="Jane Smith"></div>
-    <div class="fg"><label>School</label><select id="ai-school"><option value="esade">ESADE</option><option value="hec">HEC Paris</option><option value="both">Both</option></select></div>
+    <div class="fg"><label>School</label><select id="ai-school"><option value="esade">ESADE</option><option value="hec">HEC Paris</option><option value="insead">INSEAD</option><option value="lbs">LBS</option><option value="iese">IESE</option><option value="ie">IE</option><option value="oxford">Oxford Saïd</option><option value="cambridge">Cambridge Judge</option><option value="bocconi">SDA Bocconi</option><option value="mannheim">Mannheim</option><option value="wbs">Warwick</option><option value="other">Other</option><option value="both">Multiple schools</option></select></div>
     <div class="fg"><label>Firm / Company</label><input id="ai-firm" placeholder="Amazon"></div>
     <div class="fg"><label>Role / Title</label><input id="ai-role" placeholder="Pathways Operations Manager"></div>
     <div class="fg full"><label>LinkedIn Profile URL</label><input id="ai-li" placeholder="https://linkedin.com/in/username"></div>
@@ -576,6 +666,8 @@ const DA = [
 let progs = JSON.parse(localStorage.getItem('ldps_progs')||'null')||JSON.parse(JSON.stringify(DP));
 let alum  = JSON.parse(localStorage.getItem('ldps_alum') ||'null')||JSON.parse(JSON.stringify(DA));
 let apps  = JSON.parse(localStorage.getItem('ldps_apps') ||'[]');
+let userProfile = JSON.parse(localStorage.getItem('ldps_profile')||'null');
+let selectedSchools = userProfile?.schools||[];
 let eId   = {prog:null,alumni:null,app:null};
 let F     = {geo:'all',fn:'all',st:'all',asc:'all',ast:'all'};
 let resumeText = '';
@@ -585,6 +677,49 @@ function persist(){
   localStorage.setItem('ldps_progs',JSON.stringify(progs));
   localStorage.setItem('ldps_alum', JSON.stringify(alum));
   localStorage.setItem('ldps_apps', JSON.stringify(apps));
+}
+
+// ═══════════════ ONBOARDING ═══════════════
+const SCHOOL_LABELS={esade:'ESADE',hec:'HEC Paris',insead:'INSEAD',lbs:'LBS',iese:'IESE',ie:'IE Business',oxford:'Oxford Saïd',cambridge:'Cambridge Judge',bocconi:'SDA Bocconi',mannheim:'Mannheim',wbs:'Warwick',other:'Other'};
+const SCHOOL_LI_IDS={esade:'3157792',hec:'4034',insead:'2444',lbs:'15169',iese:'27278',ie:'27318',oxford:'12462',cambridge:'27462',bocconi:'9931',mannheim:'14826',wbs:'14826',other:null};
+
+function toggleSchool(btn){
+  btn.classList.toggle('sel');
+  const s=btn.getAttribute('data-school');
+  if(btn.classList.contains('sel')){if(!selectedSchools.includes(s))selectedSchools.push(s);}
+  else{selectedSchools=selectedSchools.filter(x=>x!==s);}
+}
+
+function saveOnboarding(){
+  const name=document.getElementById('ob-name').value.trim();
+  const email=document.getElementById('ob-email').value.trim();
+  if(!name){alert('Please enter your name.');return;}
+  userProfile={name,email,schools:selectedSchools};
+  localStorage.setItem('ldps_profile',JSON.stringify(userProfile));
+  document.getElementById('onboard-overlay').classList.remove('open');
+  applyProfile();
+  toast(`Welcome, ${name.split(' ')[0]}! ✓`);
+}
+
+function skipOnboarding(){
+  localStorage.setItem('ldps_ob_skipped','1');
+  document.getElementById('onboard-overlay').classList.remove('open');
+}
+
+function applyProfile(){
+  if(!userProfile) return;
+  // Update topbar greeting
+  const lbl=document.getElementById('today-lbl');
+  if(lbl&&userProfile.name) lbl.title=`Signed in as ${userProfile.name}`;
+  // Update alumni tip
+  const schools=userProfile.schools||[];
+  if(schools.length){
+    const names=schools.map(s=>SCHOOL_LABELS[s]||s).join(', ');
+    const tip=document.getElementById('alumni-tip');
+    if(tip) tip.innerHTML=`<strong>Personalised for:</strong> ${names}. Each LinkedIn button below searches your school's alumni directory for that company and program. Log people you find using "+ Add Contact". Reach out 6–8 weeks before applications open.`;
+  }
+  renderSchoolPills();
+  renderAlumniSearch();
 }
 
 // ═══════════════ PAYWALL ═══════════════
@@ -613,7 +748,7 @@ function showPage(id){
   const tabs=document.querySelectorAll('.nav-tab');
   if(idx>=0&&tabs[idx]) tabs[idx].classList.add('active');
   if(id==='aifit'&&!isUnlocked){document.getElementById('paywall-overlay').classList.add('open');return;}
-  ({programs:renderPrograms,alumni:renderAlumni,applications:renderApplications,deadlines:renderDeadlines,aifit:()=>{}})[id]?.();
+  ({programs:renderPrograms,alumni:()=>{renderAlumni();renderAlumniSearch();renderSchoolPills();},applications:renderApplications,deadlines:renderDeadlines,aifit:()=>{}})[id]?.();
 }
 
 // ═══════════════ FILTERS ═══════════════
@@ -733,11 +868,81 @@ function renderPrograms(){
     </div>`;
 }
 
+// ═══════════════ ALUMNI SEARCH (dynamic) ═══════════════
+function renderSchoolPills(){
+  const schools=(userProfile?.schools||[]);
+  const container=document.getElementById('alumni-school-pills');
+  if(!container) return;
+  if(!schools.length){
+    container.innerHTML=`<span style="font-size:11px;color:var(--text3);font-style:italic">Set up profile to filter by your school</span><button class="fpill" onclick="document.getElementById('onboard-overlay').classList.add('open')" style="margin-left:4px">Set school</button>`;
+    return;
+  }
+  container.innerHTML=schools.map(s=>`<span class="badge b-open" style="font-size:11px">${SCHOOL_LABELS[s]||s}</span>`).join('')+
+    `<button class="fpill" onclick="document.getElementById('onboard-overlay').classList.add('open')" style="font-size:10px">✎ Edit</button>`;
+}
+
+function buildLinkedInUrl(schoolKey,keywords){
+  const liId=SCHOOL_LI_IDS[schoolKey];
+  if(!liId) return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(keywords)}`;
+  return `https://www.linkedin.com/school/${liId}/people/?keywords=${encodeURIComponent(keywords)}`;
+}
+
+function renderAlumniSearch(){
+  const container=document.getElementById('alumni-search-cards');
+  if(!container) return;
+  const q=(document.getElementById('alumni-prog-search')||{}).value?.toLowerCase()||'';
+  const schools=(userProfile?.schools||[]);
+
+  const filtered=progs.filter(p=>{
+    if(!q) return true;
+    return p.name.toLowerCase().includes(q)||p.org.toLowerCase().includes(q)||(p.fn||'').includes(q)||(p.sector||'').includes(q)||(p.tags||[]).some(t=>t.toLowerCase().includes(q));
+  });
+
+  if(!filtered.length){container.innerHTML='<div class="empty" style="grid-column:1/-1">No programs match your search.</div>';return;}
+
+  container.innerHTML=filtered.map(p=>{
+    // Build keyword variants for this program
+    const kw1=`${p.org} ${p.name.split(' ').slice(0,4).join(' ')}`.trim();
+    const kw2=p.org;
+    const shortName=p.name.replace(/MBA|LDP|Leadership Development Program|Program|Programme/gi,'').replace(/\s+/g,' ').trim().split(' ').slice(0,3).join(' ');
+    const kw3=`${p.org} ${shortName}`.trim();
+
+    let linksHtml='';
+    if(!schools.length){
+      // No school set — show generic LinkedIn search
+      linksHtml=`<a href="https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(kw1)}" target="_blank" rel="noopener noreferrer">Search LinkedIn →</a>`;
+    } else {
+      schools.forEach(s=>{
+        const label=SCHOOL_LABELS[s]||s;
+        const url1=buildLinkedInUrl(s,kw1);
+        const url2=buildLinkedInUrl(s,kw2);
+        linksHtml+=`<a href="${url1}" target="_blank" rel="noopener noreferrer">${label} + Program →</a>`;
+        linksHtml+=`<a href="${url2}" target="_blank" rel="noopener noreferrer">${label} + Company →</a>`;
+      });
+    }
+
+    const schoolBadges=!schools.length?''
+      :schools.map(s=>`<span class="stag ${s==='hec'?'hec':s==='esade'?'esade':''}" style="${!['esade','hec'].includes(s)?'background:var(--teal-bg);color:var(--teal);border-color:rgba(13,107,107,.2)':''}">${SCHOOL_LABELS[s]||s}</span>`).join('');
+
+    return `<div class="ali-search-card">
+      <div class="ali-sc-top">
+        <div>
+          <div class="ali-sc-name">${p.name}</div>
+          <div class="ali-sc-org">${p.org} · ${p.loc||p.geo}</div>
+        </div>
+        <span class="badge ${p.status==='open'?'b-open':p.status==='rolling'?'b-rolling':'b-watch'}" style="flex-shrink:0;font-size:10px">${cap(p.status)}</span>
+      </div>
+      ${schoolBadges?`<div class="ali-sc-school-badges">${schoolBadges}</div>`:''}
+      <div class="ali-sc-links">${linksHtml}</div>
+      ${p.notes?`<div class="ali-sc-tip">${p.notes.substring(0,90)}${p.notes.length>90?'…':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
 // ═══════════════ ALUMNI ═══════════════
 function renderAlumni(){
   const q=(document.getElementById('alumni-search')||{}).value?.toLowerCase()||'';
   const list=alum.filter(a=>{
-    if(F.asc!=='all'&&a.school!==F.asc&&a.school!=='both') return false;
     if(F.ast!=='all'&&a.status!==F.ast) return false;
     if(q&&!a.name.toLowerCase().includes(q)&&!a.firm.toLowerCase().includes(q)&&!(a.prog||'').toLowerCase().includes(q)) return false;
     return true;
@@ -746,11 +951,14 @@ function renderAlumni(){
   const avc=['#1a4fa8','#b33a1a','#1d6a45','#5a3a9a','#0d6b6b'];
   const ini=n=>n.replace(/[\[\]]/g,'').split(' ').filter(Boolean).map(w=>w[0]||'').join('').substring(0,2).toUpperCase()||'?';
   const sbadge=s=>{
+    const label=SCHOOL_LABELS[s]||s;
+    const cls=['esade','hec'].includes(s)?`stag ${s}`:'stag esade';
+    const style=['esade','hec'].includes(s)?'':`style="background:var(--teal-bg);color:var(--teal);border-color:rgba(13,107,107,.2)"`;
     if(s==='both') return `<span class="stag esade">ESADE</span> <span class="stag hec">HEC Paris</span>`;
-    return s==='hec'?`<span class="stag hec">HEC Paris</span>`:`<span class="stag esade">ESADE</span>`;
+    return `<span class="${cls}" ${style}>${label}</span>`;
   };
   document.getElementById('alumni-list').innerHTML=list.length===0
-    ?'<div class="empty" style="grid-column:1/-1">No contacts found. Use the LinkedIn buttons to find alumni, then add them here.</div>'
+    ?'<div class="empty" style="grid-column:1/-1">No contacts found. Use the LinkedIn search cards above to find alumni, then add them here.</div>'
     :list.map((a,i)=>{
       const [sc,sl]=smap[a.status]||['c-id','Identified'];
       return `<div class="acard">
@@ -762,7 +970,7 @@ function renderAlumni(){
         ${a.loc?`<div style="font-size:11px;color:var(--text3);margin-bottom:3px">📍 ${a.loc}${a.prog?' · '+a.prog:''}</div>`:''}
         ${a.notes?`<div class="anotes">${a.notes}</div>`:''}
         <div class="afoot">
-          ${a.li?`<a class="li-btn" href="${a.li}" target="_blank" rel="noopener noreferrer">Search LinkedIn →</a>`:''}
+          ${a.li?`<a class="li-btn" href="${a.li}" target="_blank" rel="noopener noreferrer">Open LinkedIn →</a>`:''}
           <button class="gbtn" onclick="editA(${a.id})">Edit</button>
           <button class="gbtn" style="color:var(--red)" onclick="delA(${a.id})">Remove</button>
         </div>
@@ -804,8 +1012,8 @@ function renderApplications(){
 function renderDeadlines(){
   const today=new Date();today.setHours(0,0,0,0);
   const items=[
-    ...progs.filter(p=>p.deadline).map(p=>({name:p.name,org:p.org,date:new Date(p.deadline),type:'program'})),
-    ...apps.filter(a=>a.deadline).map(a=>({name:a.name,org:a.org||'',date:new Date(a.deadline),type:'application'}))
+    ...progs.filter(p=>p.deadline).map(p=>({name:p.name,org:p.org,date:new Date(p.deadline),type:'program',deadline:p.deadline})),
+    ...apps.filter(a=>a.deadline).map(a=>({name:a.name,org:a.org||'',date:new Date(a.deadline),type:'application',deadline:a.deadline}))
   ].filter(i=>i.date>=today).sort((a,b)=>a.date-b.date);
   document.getElementById('dl-list').innerHTML=items.length===0
     ?'<div class="empty">No upcoming deadlines tracked. Add deadline dates to your programs and applications.</div>'
@@ -815,11 +1023,67 @@ function renderDeadlines(){
       const lbl=d===0?'TODAY!':d===1?'1 day':`${d} days`;
       return `<div class="dlitem">
         <div class="dldate">${i.date.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
-        <div><div class="dlname">${i.name}</div><div class="dlorg">${i.org}</div></div>
+        <div style="flex:1"><div class="dlname">${i.name}</div><div class="dlorg">${i.org}</div></div>
         <span class="dltype">${i.type}</span>
         <div class="dldays ${cls}">${lbl}</div>
+        <div class="dlitem-actions">
+          <button class="ics-btn" onclick="downloadICS(${JSON.stringify(i).replace(/"/g,'&quot;')})" title="Add to calendar">📅 Remind me</button>
+        </div>
       </div>`;
     }).join('');
+}
+
+function downloadICS(item){
+  const dl=new Date(item.deadline);
+  // Generate two reminders: 7 days before and day before
+  const fmt=d=>{
+    const s=d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+    return s;
+  };
+  const uid=`ldpscout-${Date.now()}@ldpscout.app`;
+  const now=fmt(new Date());
+  const due=fmt(dl);
+  // Day before
+  const dayBefore=new Date(dl);dayBefore.setDate(dayBefore.getDate()-1);
+  // 7 days before
+  const weekBefore=new Date(dl);weekBefore.setDate(weekBefore.getDate()-7);
+
+  const ics=`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//LDP Scout//LDP Deadline//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:${uid}
+DTSTART;VALUE=DATE:${dl.toISOString().split('T')[0].replace(/-/g,'')}
+DTEND;VALUE=DATE:${dl.toISOString().split('T')[0].replace(/-/g,'')}
+DTSTAMP:${now}
+SUMMARY:DEADLINE: ${item.name} (${item.org})
+DESCRIPTION:LDP application deadline for ${item.name} at ${item.org}. Type: ${item.type}. Tracked via LDP Scout.
+BEGIN:VALARM
+TRIGGER:-P7D
+ACTION:DISPLAY
+DESCRIPTION:7 days until: ${item.name} deadline
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: ${item.name} deadline — final check!
+END:VALARM
+BEGIN:VALARM
+TRIGGER:PT0S
+ACTION:DISPLAY
+DESCRIPTION:TODAY: ${item.name} deadline
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+
+  const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`ldp-deadline-${item.org.toLowerCase().replace(/\s+/g,'-')}.ics`;
+  a.click();
+  toast('📅 Calendar file downloaded — open it to add to your calendar');
 }
 
 // ═══════════════ AI FIT ═══════════════
@@ -882,20 +1146,94 @@ Include exactly 6 suggestions. Every program must appear in exactly one tier.`;
 
   const usr=`RESUME:\n${resumeText.substring(0,5500)}\n\nPROGRAMS (ID|Name|Org|Function|Sector|Geo|Status|Tags|Notes):\n${progSummary}`;
 
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+  // Try proxy first (for production), fall back to direct call (for local dev)
+  const PROXY_URL = window.LDP_PROXY_URL || null; // Set this if you deploy a proxy
+  const DIRECT_URL = 'https://api.anthropic.com/v1/messages';
+
+  const makeRequest = async (url, useProxy) => {
+    const headers = {'Content-Type':'application/json'};
+    if(!useProxy){
+      // Direct call — works in local file:// or if CORS is resolved
+      headers['x-api-key'] = window.LDP_API_KEY || '';
+      headers['anthropic-version'] = '2023-06-01';
+      headers['anthropic-dangerous-direct-browser-access'] = 'true';
+    }
+    return fetch(url, {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,system:sys,messages:[{role:'user',content:usr}]})
+      headers,
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:3000,
+        system:sys,
+        messages:[{role:'user',content:usr}]
+      })
     });
-    const data=await res.json();
+  };
+
+  try{
+    let res, data;
+    if(PROXY_URL){
+      res = await makeRequest(PROXY_URL, true);
+    } else {
+      res = await makeRequest(DIRECT_URL, false);
+    }
+    data = await res.json();
+
+    // Handle API errors
+    if(data.error){
+      if(data.error.type==='authentication_error'||data.error.message?.includes('api key')){
+        showApiKeyPrompt();
+        btn.disabled=false;btn.textContent='✦ Analyse My Fit';
+        return;
+      }
+      throw new Error(data.error.message||'API error');
+    }
+
     const raw=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
     const clean=raw.replace(/```json|```/g,'').trim();
     renderAIResults(JSON.parse(clean));
   }catch(err){
-    document.getElementById('ai-results').innerHTML=`<div class="empty">Error: ${err.message}. Please try again.</div>`;
+    // Check if it's a CORS/network error
+    if(err.message==='Failed to fetch'||err.name==='TypeError'){
+      showApiKeyPrompt();
+    } else {
+      document.getElementById('ai-results').innerHTML=`<div class="empty">
+        <div style="font-size:24px;margin-bottom:12px">⚠️</div>
+        <div style="font-weight:500;margin-bottom:6px">Analysis Error</div>
+        <div style="font-size:12px;color:var(--text3)">${err.message}</div>
+        <button onclick="runAIAnalysis()" style="margin-top:12px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px">Try Again</button>
+      </div>`;
+    }
   }
   btn.disabled=false;btn.textContent='✦ Re-analyse';
+}
+
+function showApiKeyPrompt(){
+  document.getElementById('ai-results').innerHTML=`
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;max-width:520px;margin:0 auto;text-align:center;box-shadow:var(--shadow-md)">
+      <div style="font-size:28px;margin-bottom:12px">🔑</div>
+      <div style="font-family:var(--serif);font-size:18px;margin-bottom:8px">API Key Required</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:20px">
+        To run the AI scanner, you need an Anthropic API key. Get one free at 
+        <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">console.anthropic.com</a> 
+        — a typical analysis costs ~$0.01.
+      </div>
+      <input id="api-key-input" type="password" placeholder="sk-ant-..." 
+        style="width:100%;padding:10px 13px;border:1px solid var(--border2);border-radius:8px;font-family:var(--mono);font-size:12px;background:var(--bg3);outline:none;margin-bottom:12px">
+      <button onclick="setApiKey()" 
+        style="width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans)">
+        Save Key &amp; Analyse →
+      </button>
+      <div style="font-size:10px;color:var(--text3);margin-top:10px">Your key is stored only in this browser session — never saved permanently.</div>
+    </div>`;
+}
+
+function setApiKey(){
+  const key=document.getElementById('api-key-input').value.trim();
+  if(!key||!key.startsWith('sk-')){alert('Please enter a valid Anthropic API key (starts with sk-)');return;}
+  window.LDP_API_KEY=key;
+  toast('Key saved for this session ✓');
+  runAIAnalysis();
 }
 
 function renderAIResults(result){
@@ -1037,8 +1375,18 @@ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
 document.getElementById('today-lbl').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
 if(isUnlocked){const b=document.getElementById('pro-badge');b.textContent='✦ Pro ✓';}
 if(!isUnlocked&&!localStorage.getItem('ldps_dismissed')){setTimeout(()=>{document.getElementById('paywall-overlay').classList.add('open');},900);}
+
+// Show onboarding if first visit
+if(!userProfile&&!localStorage.getItem('ldps_ob_skipped')){
+  setTimeout(()=>{document.getElementById('onboard-overlay').classList.add('open');},400);
+} else {
+  applyProfile();
+}
+
 window._fitOnly=false;
 renderPrograms();
+renderSchoolPills();
+renderAlumniSearch();
 </script>
 </body>
 </html>
