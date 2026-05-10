@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LDP Command Center — Shrey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:ital,wght@0,400;0,500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f5f4f0;
+  --bg2:      #ffffff;
+  --bg3:      #f0eeea;
+  --bg4:      #e8e6e1;
+  --border:   rgba(0,0,0,0.08);
+  --border2:  rgba(0,0,0,0.14);
+  --text:     #1a1a18;
+  --text2:    #5a5a54;
+  --text3:    #9a9a92;
+  --accent:   #1a6b3a;
+  --accent-bg:#e8f5ee;
+  --blue:     #1a4fa8;
+  --blue-bg:  #e8eef8;
+  --amber:    #8a5e00;
+  --amber-bg: #fdf3d8;
+  --coral:    #b33a1a;
+  --coral-bg: #fdeee8;
+  --teal:     #0d6b6b;
+  --teal-bg:  #e0f4f4;
+  --purple:   #5a3a9a;
+  --purple-bg:#eeebf8;
+  --red:      #c0392b;
+  --green:    #1a6b3a;
+  --green-bg: #e8f5ee;
+  --mono: 'DM Mono', monospace;
+  --serif: 'Instrument Serif', serif;
+  --sans: 'Geist', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+/* TOPBAR */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 28px; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; background:rgba(245,244,240,0.96); backdrop-filter:blur(8px); }
+.logo { font-family:var(--serif); font-size:19px; }
+.logo em { color:var(--accent); font-style:italic; }
+.nav-tabs { display:flex; gap:2px; background:var(--bg3); border-radius:9px; padding:3px; border:1px solid var(--border); }
+.nav-tab { padding:6px 18px; font-size:12px; font-weight:500; border-radius:7px; cursor:pointer; color:var(--text2); border:none; background:none; font-family:var(--sans); transition:all 0.15s; }
+.nav-tab.active { background:var(--bg2); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+.date-lbl { font-family:var(--mono); font-size:11px; color:var(--text3); }
+
+/* LAYOUT */
+.main { padding:24px 28px; max-width:1400px; margin:0 auto; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* STATS */
+.stat-row { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:22px; }
+.stat-card { background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+.stat-num { font-family:var(--mono); font-size:26px; font-weight:500; }
+.stat-num.cg { color:var(--green); }
+.stat-num.cb { color:var(--blue); }
+.stat-num.ca { color:var(--amber); }
+.stat-num.cc { color:var(--coral); }
+.stat-lbl { font-size:11px; color:var(--text3); margin-top:3px; text-transform:uppercase; letter-spacing:.06em; }
+
+/* FILTER ROW */
+.filter-row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+.flabel { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; white-space:nowrap; }
+.fpill { font-size:11px; padding:5px 13px; border-radius:20px; border:1px solid var(--border2); background:var(--bg2); color:var(--text2); cursor:pointer; font-family:var(--sans); transition:all .12s; white-space:nowrap; }
+.fpill:hover { border-color:var(--accent); color:var(--accent); }
+.fpill.on { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
+.divider { width:1px; height:20px; background:var(--border2); margin:0 4px; flex-shrink:0; }
+.si { background:var(--bg2); border:1px solid var(--border2); border-radius:8px; padding:7px 13px; font-size:12px; color:var(--text); font-family:var(--sans); outline:none; min-width:180px; }
+.si:focus { border-color:var(--accent); }
+.si::placeholder { color:var(--text3); }
+.spacer { flex:1; min-width:8px; }
+.add-btn { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:var(--sans); white-space:nowrap; }
+.add-btn:hover { opacity:.88; }
+
+/* TABLE */
+.table-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.thead { display:grid; grid-template-columns:2.2fr 1.1fr 1fr 1fr .7fr .6fr 110px; padding:9px 16px; border-bottom:1px solid var(--border); background:var(--bg3); }
+.th { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; }
+.prow { display:grid; grid-template-columns:2.2fr 1.1fr 1fr 1fr .7fr .6fr 110px; padding:13px 16px; border-bottom:1px solid var(--border); align-items:center; }
+.prow:last-child { border-bottom:none; }
+.prow:hover { background:var(--bg3); }
+.pname { font-size:13px; font-weight:500; }
+.porg  { font-size:11px; color:var(--text2); margin-top:2px; }
+.plink { font-size:11px; color:var(--blue); text-decoration:none; margin-top:3px; display:inline-block; }
+.plink:hover { text-decoration:underline; }
+.tags  { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+.tag   { font-size:10px; padding:2px 7px; border-radius:4px; background:var(--bg3); color:var(--text2); border:1px solid var(--border); }
+.cell  { font-size:12px; color:var(--text2); }
+.mono  { font-family:var(--mono); font-size:11px; }
+
+/* BADGES */
+.badge { font-size:10px; padding:3px 9px; border-radius:20px; font-weight:500; display:inline-block; border:1px solid; }
+.b-open    { background:var(--green-bg); color:var(--green);  border-color:rgba(26,107,58,.2); }
+.b-rolling { background:var(--blue-bg);  color:var(--blue);   border-color:rgba(26,79,168,.2); }
+.b-watch   { background:var(--amber-bg); color:var(--amber);  border-color:rgba(138,94,0,.2); }
+.b-closed  { background:var(--bg3);      color:var(--text3);  border-color:var(--border); }
+
+/* ACTION BUTTONS */
+.abts { display:flex; gap:5px; }
+.bsm { font-size:10px; padding:4px 10px; border-radius:6px; border:1px solid var(--border2); background:var(--bg3); color:var(--text2); cursor:pointer; font-family:var(--sans); }
+.bsm:hover { border-color:var(--accent); color:var(--accent); }
+.bsm.del:hover { border-color:var(--red); color:var(--red); }
+.stars { color:#c8971a; letter-spacing:1px; font-size:11px; }
+
+/* SEC HEADER */
+.sech { margin-bottom:18px; }
+.sech h2 { font-family:var(--serif); font-size:22px; font-weight:400; }
+.sech p  { font-size:12px; color:var(--text3); margin-top:3px; }
+
+/* ALUMNI TIP */
+.atip { font-size:12px; color:var(--text2); background:var(--blue-bg); border:1px solid rgba(26,79,168,.15); border-left:3px solid var(--blue); border-radius:0 8px 8px 0; padding:11px 14px; margin-bottom:18px; line-height:1.6; }
+.atip strong { color:var(--blue); }
+
+/* ALUMNI GRID */
+.agrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:12px; }
+.acard { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+.acard:hover { border-color:var(--border2); }
+.ahead { display:flex; align-items:center; gap:11px; margin-bottom:10px; }
+.avatar { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; flex-shrink:0; }
+.aname { font-size:14px; font-weight:500; }
+.arole { font-size:11px; color:var(--text2); margin-top:1px; }
+.stag  { font-size:10px; padding:3px 9px; border-radius:4px; font-weight:500; border:1px solid; display:inline-block; }
+.esade { background:var(--blue-bg); color:var(--blue); border-color:rgba(26,79,168,.2); }
+.hec   { background:var(--coral-bg); color:var(--coral); border-color:rgba(179,58,26,.2); }
+.cs    { font-size:10px; padding:3px 9px; border-radius:4px; font-weight:500; border:1px solid; display:inline-block; }
+.c-id  { background:var(--bg3); color:var(--text3); border-color:var(--border2); }
+.c-rc  { background:var(--amber-bg); color:var(--amber); border-color:rgba(138,94,0,.2); }
+.c-rp  { background:var(--blue-bg); color:var(--blue); border-color:rgba(26,79,168,.2); }
+.c-cf  { background:var(--teal-bg); color:var(--teal); border-color:rgba(13,107,107,.2); }
+.c-rf  { background:var(--green-bg); color:var(--green); border-color:rgba(26,107,58,.2); }
+.anotes { font-size:11px; color:var(--text3); margin-top:9px; line-height:1.55; }
+.afoot  { margin-top:11px; display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+.li-btn { font-size:11px; padding:5px 12px; border-radius:6px; background:var(--blue-bg); border:1px solid rgba(26,79,168,.2); color:var(--blue); cursor:pointer; text-decoration:none; font-family:var(--sans); display:inline-block; }
+.li-btn:hover { background:var(--blue); color:#fff; }
+.gbtn { font-size:11px; padding:5px 11px; border-radius:6px; background:var(--bg3); border:1px solid var(--border2); color:var(--text2); cursor:pointer; font-family:var(--sans); }
+
+/* KANBAN */
+.kanban { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.kcol { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:13px; min-height:280px; }
+.khd { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; margin-bottom:11px; display:flex; align-items:center; justify-content:space-between; }
+.kct { font-family:var(--mono); font-size:10px; background:var(--bg3); padding:2px 6px; border-radius:8px; color:var(--text3); font-weight:400; }
+.apcard { background:var(--bg3); border:1px solid var(--border); border-radius:8px; padding:11px; margin-bottom:7px; cursor:pointer; transition:border-color .1s; }
+.apcard:hover { border-color:var(--border2); }
+.apct  { font-size:12px; font-weight:500; }
+.apco  { font-size:11px; color:var(--text2); margin-top:2px; }
+.apnx  { font-size:10px; color:var(--accent); margin-top:6px; }
+.apdl  { font-family:var(--mono); font-size:10px; color:var(--text3); margin-top:4px; }
+
+/* DEADLINES */
+.dllist { display:flex; flex-direction:column; gap:9px; }
+.dlitem { display:flex; align-items:center; gap:16px; background:var(--bg2); border:1px solid var(--border); border-radius:10px; padding:13px 16px; }
+.dldate { font-family:var(--mono); font-size:12px; color:var(--accent); min-width:110px; font-weight:500; }
+.dlname { font-size:13px; font-weight:500; flex:1; }
+.dlorg  { font-size:11px; color:var(--text2); margin-top:1px; }
+.dldays { font-family:var(--mono); font-size:12px; font-weight:500; }
+.dldays.urg  { color:var(--coral); }
+.dldays.soon { color:var(--amber); }
+.dldays.ok   { color:var(--teal); }
+.dltype { font-size:10px; padding:2px 8px; border-radius:4px; background:var(--bg3); color:var(--text3); border:1px solid var(--border); }
+
+/* MODAL */
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:200; display:none; align-items:center; justify-content:center; backdrop-filter:blur(3px); }
+.overlay.open { display:flex; }
+.modal { background:var(--bg2); border:1px solid var(--border2); border-radius:14px; padding:26px; width:560px; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 8px 40px rgba(0,0,0,.12); }
+.mtitle { font-family:var(--serif); font-size:20px; margin-bottom:18px; }
+.mclose { position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; color:var(--text3); cursor:pointer; line-height:1; }
+.mclose:hover { color:var(--text); }
+.fgrid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+.full { grid-column:1/-1; }
+.fg label { display:block; font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; }
+.fg input, .fg select, .fg textarea { width:100%; background:var(--bg3); border:1px solid var(--border2); border-radius:7px; padding:8px 11px; font-size:13px; color:var(--text); font-family:var(--sans); outline:none; }
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color:var(--accent); background:var(--bg2); }
+.fg textarea { height:68px; resize:vertical; }
+.mfoot { display:flex; gap:9px; justify-content:flex-end; margin-top:20px; border-top:1px solid var(--border); padding-top:16px; }
+.bcn { background:var(--bg3); border:1px solid var(--border2); color:var(--text2); border-radius:7px; padding:8px 18px; font-size:13px; cursor:pointer; font-family:var(--sans); }
+.bsv { background:var(--accent); border:none; color:#fff; border-radius:7px; padding:8px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:var(--sans); }
+.bsv:hover { opacity:.88; }
+
+/* EMPTY / TOAST */
+.empty { text-align:center; padding:40px 24px; color:var(--text3); font-size:13px; }
+.toast { position:fixed; bottom:22px; right:22px; background:var(--text); color:var(--bg2); padding:9px 18px; border-radius:8px; font-size:13px; font-weight:500; z-index:300; transform:translateY(50px); opacity:0; transition:all .2s; pointer-events:none; }
+.toast.show { transform:translateY(0); opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">LDP <em>Command Center</em></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('programs')">Programs</button>
+    <button class="nav-tab" onclick="showPage('alumni')">Alumni</button>
+    <button class="nav-tab" onclick="showPage('applications')">Applications</button>
+    <button class="nav-tab" onclick="showPage('deadlines')">Deadlines</button>
+  </div>
+  <div class="date-lbl" id="today-lbl"></div>
+</div>
+
+<div class="main">
+
+<!-- PROGRAMS PAGE -->
+<div class="page active" id="page-programs">
+  <div class="stat-row" id="prog-stats"></div>
+  <div class="filter-row">
+    <input class="si" id="prog-search" type="text" placeholder="Search programs or firms..." oninput="renderPrograms()">
+    <div class="divider"></div>
+    <span class="flabel">Geo</span>
+    <button class="fpill on"  data-geo="all"    onclick="setF('geo',this)">All</button>
+    <button class="fpill"     data-geo="europe" onclick="setF('geo',this)">Europe</button>
+    <button class="fpill"     data-geo="uae"    onclick="setF('geo',this)">UAE / Gulf</button>
+    <button class="fpill"     data-geo="global" onclick="setF('geo',this)">Global</button>
+    <div class="divider"></div>
+    <span class="flabel">Function</span>
+    <button class="fpill on"  data-fn="all"        onclick="setF('fn',this)">All</button>
+    <button class="fpill"     data-fn="operations" onclick="setF('fn',this)">Operations</button>
+    <button class="fpill"     data-fn="finance"    onclick="setF('fn',this)">Finance</button>
+    <button class="fpill"     data-fn="strategy"   onclick="setF('fn',this)">Strategy</button>
+    <button class="fpill"     data-fn="consulting" onclick="setF('fn',this)">Consulting</button>
+    <button class="fpill"     data-fn="investing"  onclick="setF('fn',this)">Investments</button>
+    <div class="divider"></div>
+    <span class="flabel">Status</span>
+    <button class="fpill on"  data-st="all"     onclick="setF('st',this)">All</button>
+    <button class="fpill"     data-st="open"    onclick="setF('st',this)">Open</button>
+    <button class="fpill"     data-st="rolling" onclick="setF('st',this)">Rolling</button>
+    <button class="fpill"     data-st="watch"   onclick="setF('st',this)">Watch</button>
+    <div class="spacer"></div>
+    <button class="add-btn" onclick="openM('prog')">+ Add Program</button>
+  </div>
+  <div class="table-wrap">
+    <div class="thead">
+      <div class="th">Program / Organization</div>
+      <div class="th">Function · Sector</div>
+      <div class="th">Location</div>
+      <div class="th">Deadline</div>
+      <div class="th">Status</div>
+      <div class="th">Fit</div>
+      <div class="th">Actions</div>
+    </div>
+    <div id="prog-list"></div>
+  </div>
+</div>
+
+<!-- ALUMNI PAGE -->
+<div class="page" id="page-alumni">
+  <div class="sech"><h2>Alumni in Target Firms</h2><p>ESADE · HEC Paris — build your network inside LDP firms before applications open</p></div>
+  <div class="atip"><strong>How to use these LinkedIn links:</strong> Each "Search LinkedIn →" button below opens LinkedIn's alumni directory for that school, pre-filtered by company keyword. You must be logged in to LinkedIn. Once you find real people, click "+ Add Contact" to track your outreach here.</div>
+  <div class="filter-row" style="margin-bottom:16px">
+    <input class="si" id="alumni-search" type="text" placeholder="Search by name, firm, or program..." oninput="renderAlumni()">
+    <div class="divider"></div>
+    <button class="fpill on" data-asc="all"   onclick="setF('asc',this)">All schools</button>
+    <button class="fpill"    data-asc="esade" onclick="setF('asc',this)">ESADE</button>
+    <button class="fpill"    data-asc="hec"   onclick="setF('asc',this)">HEC Paris</button>
+    <div class="spacer"></div>
+    <button class="add-btn" onclick="openM('alumni')">+ Add Contact</button>
+  </div>
+  <div class="agrid" id="alumni-list"></div>
+</div>
+
+<!-- APPLICATIONS PAGE -->
+<div class="page" id="page-applications">
+  <div class="sech"><h2>Application Tracker</h2><p id="app-sub"></p></div>
+  <div class="filter-row" style="margin-bottom:18px">
+    <input class="si" id="app-search" type="text" placeholder="Search applications..." oninput="renderApplications()">
+    <div class="spacer"></div>
+    <button class="add-btn" onclick="openM('app')">+ Log Application</button>
+  </div>
+  <div class="kanban" id="app-kanban"></div>
+</div>
+
+<!-- DEADLINES PAGE -->
+<div class="page" id="page-deadlines">
+  <div class="sech"><h2>Upcoming Deadlines</h2><p>Sorted by urgency — act on red first</p></div>
+  <div class="dllist" id="dl-list"></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- PROGRAM MODAL -->
+<div class="overlay" id="ov-prog">
+<div class="modal">
+  <button class="mclose" onclick="closeM('prog')">×</button>
+  <div class="mtitle">Add / Edit Program</div>
+  <div class="fgrid">
+    <div class="fg full"><label>Program Name</label><input id="pi-name" placeholder="e.g. Amazon Pathways Operations LDP"></div>
+    <div class="fg"><label>Organization</label><input id="pi-org" placeholder="Amazon"></div>
+    <div class="fg"><label>Careers Page URL</label><input id="pi-url" placeholder="https://..."></div>
+    <div class="fg"><label>Geography</label>
+      <select id="pi-geo"><option value="europe">Europe</option><option value="uae">UAE / Gulf</option><option value="global">Global</option></select></div>
+    <div class="fg"><label>Location</label><input id="pi-loc" placeholder="London, UK"></div>
+    <div class="fg"><label>Function</label>
+      <select id="pi-fn">
+        <option value="strategy">Strategy</option>
+        <option value="finance">Finance</option>
+        <option value="operations">Operations</option>
+        <option value="consulting">Consulting</option>
+        <option value="general">General Management</option>
+        <option value="investing">Investments / PE</option>
+      </select></div>
+    <div class="fg"><label>Sector</label>
+      <select id="pi-sector">
+        <option value="tech">Technology</option>
+        <option value="finance">Financial Services</option>
+        <option value="consumer">Consumer / FMCG</option>
+        <option value="healthcare">Healthcare</option>
+        <option value="logistics">Logistics / Supply Chain</option>
+        <option value="energy">Energy</option>
+        <option value="sovereign">Sovereign / DFI</option>
+        <option value="other">Other</option>
+      </select></div>
+    <div class="fg"><label>Status</label>
+      <select id="pi-status">
+        <option value="open">Open now</option>
+        <option value="rolling">Rolling</option>
+        <option value="watch">Watch — prep now</option>
+        <option value="closed">Closed</option>
+      </select></div>
+    <div class="fg"><label>Deadline Date</label><input id="pi-deadline" type="date"></div>
+    <div class="fg"><label>Deadline Note</label><input id="pi-dlnote" placeholder="e.g. Rolling — apply early"></div>
+    <div class="fg"><label>Fit Score</label>
+      <select id="pi-fit">
+        <option value="5">★★★★★ Perfect fit</option>
+        <option value="4" selected>★★★★ Strong fit</option>
+        <option value="3">★★★ Good fit</option>
+        <option value="2">★★ Partial fit</option>
+        <option value="1">★ Stretch</option>
+      </select></div>
+    <div class="fg full"><label>Notes</label><textarea id="pi-notes" placeholder="Key notes, next steps, alumni contacts to reach..."></textarea></div>
+    <div class="fg full"><label>Tags (comma separated)</label><input id="pi-tags" placeholder="MBA, Rotational, Finance"></div>
+  </div>
+  <div class="mfoot"><button class="bcn" onclick="closeM('prog')">Cancel</button><button class="bsv" onclick="saveProg()">Save Program</button></div>
+</div>
+</div>
+
+<!-- ALUMNI MODAL -->
+<div class="overlay" id="ov-alumni">
+<div class="modal">
+  <button class="mclose" onclick="closeM('alumni')">×</button>
+  <div class="mtitle">Add Alumni Contact</div>
+  <div class="fgrid">
+    <div class="fg"><label>Full Name</label><input id="ai-name" placeholder="Jane Smith"></div>
+    <div class="fg"><label>School</label>
+      <select id="ai-school"><option value="esade">ESADE</option><option value="hec">HEC Paris</option><option value="both">Both</option></select></div>
+    <div class="fg"><label>Firm / Company</label><input id="ai-firm" placeholder="Amazon"></div>
+    <div class="fg"><label>Role / Title</label><input id="ai-role" placeholder="Pathways Operations Manager"></div>
+    <div class="fg full"><label>LinkedIn Profile URL</label><input id="ai-li" placeholder="https://linkedin.com/in/username"></div>
+    <div class="fg"><label>Linked Program</label><input id="ai-prog" placeholder="Amazon Pathways"></div>
+    <div class="fg"><label>Location</label><input id="ai-loc" placeholder="London, UK"></div>
+    <div class="fg full"><label>Contact Status</label>
+      <select id="ai-status">
+        <option value="identified">Identified — not reached out yet</option>
+        <option value="reached">Reached out</option>
+        <option value="replied">Replied</option>
+        <option value="coffee">Coffee chat done</option>
+        <option value="referred">Referred / Endorsed</option>
+      </select></div>
+    <div class="fg full"><label>Notes</label><textarea id="ai-notes" placeholder="How you know them, what you discussed, next step..."></textarea></div>
+  </div>
+  <div class="mfoot"><button class="bcn" onclick="closeM('alumni')">Cancel</button><button class="bsv" onclick="saveAlumni()">Save Contact</button></div>
+</div>
+</div>
+
+<!-- APPLICATION MODAL -->
+<div class="overlay" id="ov-app">
+<div class="modal">
+  <button class="mclose" onclick="closeM('app')">×</button>
+  <div class="mtitle">Log Application</div>
+  <div class="fgrid">
+    <div class="fg full"><label>Program / Role</label><input id="aps-name" placeholder="Amazon Pathways Operations LDP"></div>
+    <div class="fg"><label>Organization</label><input id="aps-org" placeholder="Amazon"></div>
+    <div class="fg"><label>Geography</label><input id="aps-geo" placeholder="EU / UAE"></div>
+    <div class="fg"><label>Status</label>
+      <select id="aps-status">
+        <option value="networking">Networking</option>
+        <option value="drafting">Drafting</option>
+        <option value="applied">Applied</option>
+        <option value="interview">Interview</option>
+        <option value="offer">Offer</option>
+        <option value="rejected">Rejected</option>
+      </select></div>
+    <div class="fg"><label>Started / Applied On</label><input id="aps-date" type="date"></div>
+    <div class="fg"><label>Deadline</label><input id="aps-deadline" type="date"></div>
+    <div class="fg full"><label>Next Step</label><input id="aps-next" placeholder="e.g. Submit cover letter by May 20"></div>
+    <div class="fg full"><label>Alumni Contact (name)</label><input id="aps-contact" placeholder="Name of alumni you have networked with"></div>
+    <div class="fg full"><label>Notes</label><textarea id="aps-notes" placeholder="Interview notes, tailoring notes, referrals..."></textarea></div>
+  </div>
+  <div class="mfoot"><button class="bcn" onclick="closeM('app')">Cancel</button><button class="bsv" onclick="saveApp()">Save Application</button></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== DATA ======
+const DP = [
+  {id:1, name:"Amazon Pathways Operations LDP",      org:"Amazon",         geo:"global", loc:"EU · UAE · India",            fn:"operations", sector:"tech",      status:"rolling", deadline:"",           dlnote:"Rolling — apply early",         fit:5, tags:["MBA","Operations","Rotational"],        notes:"Primary target. 3-year accelerator. Find cohort members on LinkedIn: search 'Amazon Pathways 2024'. Apply early — no fixed deadline.",           url:"https://www.amazon.jobs/en/landing_pages/pathways"},
+  {id:2, name:"Microsoft Aspire Experience (MBA)",   org:"Microsoft",      geo:"global", loc:"Dublin · Amsterdam · Dubai",   fn:"strategy",   sector:"tech",      status:"watch",   deadline:"2026-10-01", dlnote:"Opens Sep–Oct annually",        fit:4, tags:["MBA","Product","Strategy"],              notes:"Strong Dublin and Dubai presence. Search 'Microsoft Aspire' on LinkedIn for current cohort members.",                                             url:"https://careers.microsoft.com"},
+  {id:3, name:"Estée Lauder SrPA Program",           org:"Estée Lauder",   geo:"global", loc:"Global (EU · US · Asia)",      fn:"general",    sector:"consumer",  status:"watch",   deadline:"2026-09-30", dlnote:"Sep 1–Sep 30 annually",         fit:3, tags:["MBA","Consumer","Rotational"],          notes:"24-month, 4 rotations for MBA grads 5+ yrs exp. Finance, brand, strategy tracks.",                                                               url:"https://www.elcompanies.com/en/careers/students/full-time-programs"},
+  {id:4, name:"Santander CIB Graduate Program",      org:"Santander",      geo:"europe", loc:"Spain · UK · Netherlands",    fn:"finance",    sector:"finance",   status:"watch",   deadline:"2026-08-01", dlnote:"Opens Aug 2026",                fit:4, tags:["IB","CIB","Graduate"],                  notes:"12-month IB immersion. Madrid, London, Paris offices. Good ESADE network connection.",                                                           url:"https://www.santander.com/en/careers"},
+  {id:5, name:"DHL Consulting LDP",                  org:"DHL",            geo:"europe", loc:"Bonn, Germany",               fn:"consulting", sector:"logistics", status:"rolling", deadline:"",           dlnote:"Rolling — check Bonn openings", fit:5, tags:["Consulting","Logistics","Strategy"],   notes:"Already targeted. Strategy & consulting rotational. Strong supply chain + strategy angle.",                                                       url:"https://careers.dhl.com"},
+  {id:6, name:"Unilever Future Leaders Programme",   org:"Unilever",       geo:"europe", loc:"UK · Netherlands · Global",   fn:"general",    sector:"consumer",  status:"open",    deadline:"2026-06-30", dlnote:"Varies by country — check now", fit:3, tags:["FMCG","General Mgmt","Rotational"],    notes:"Finance, supply chain, strategy tracks. ESADE alumni in Unilever Spain worth contacting.",                                                       url:"https://careers.unilever.com/uflp"},
+  {id:7, name:"BCG Associate (Full-time)",            org:"BCG",            geo:"europe", loc:"London · Dubai · Amsterdam",  fn:"consulting", sector:"finance",   status:"open",    deadline:"",           dlnote:"Rolling for MBA hires",         fit:4, tags:["Strategy Consulting","MBA"],             notes:"Structured mentorship + clear progression. Strong ESADE + HEC placement history.",                                                               url:"https://careers.bcg.com"},
+  {id:8, name:"Mastercard MBA Leadership Program",   org:"Mastercard",     geo:"uae",    loc:"UAE · Europe",                fn:"strategy",   sector:"finance",   status:"watch",   deadline:"2026-10-15", dlnote:"Opens Sep–Oct annually",        fit:4, tags:["Fintech","Strategy","MBA"],              notes:"Rotational 2-year program. Dubai & London offices hire. Fintech angle aligns with background.",                                                  url:"https://careers.mastercard.com"},
+  {id:9, name:"Mubadala Graduate Programme",         org:"Mubadala",       geo:"uae",    loc:"Abu Dhabi, UAE",              fn:"investing",  sector:"sovereign", status:"watch",   deadline:"",           dlnote:"Watch LinkedIn & careers page", fit:5, tags:["Sovereign Wealth","PE/VC","UAE"],        notes:"Top UAE sovereign fund. PE/VC + healthcare angle (Quadria Capital) is strong fit. Very competitive — limited spots.",                            url:"https://www.mubadala.com/en/careers"},
+  {id:10,name:"Chalhoub Group Management Associate", org:"Chalhoub Group", geo:"uae",    loc:"Dubai · GCC",                 fn:"general",    sector:"consumer",  status:"open",    deadline:"",           dlnote:"Rolling",                       fit:3, tags:["Luxury Retail","GCC","Rotational"],      notes:"Luxury retail conglomerate. Strategy, brand, retail ops rotations across GCC.",                                                                  url:"https://chalhoubgroup.com/careers"},
+  {id:11,name:"Maersk Commercial Graduate Programme",org:"Maersk",         geo:"europe", loc:"Copenhagen · Global",         fn:"operations", sector:"logistics", status:"open",    deadline:"2026-07-15", dlnote:"Rolling intake — check openings",fit:4, tags:["Logistics","Supply Chain","Rotational"], notes:"2-year rotational. Strong supply chain + operations angle. Copenhagen HQ with global postings.",                                                 url:"https://www.maersk.com/careers/students-and-graduates"},
+  {id:12,name:"IFC / World Bank Young Professionals",org:"IFC / World Bank",geo:"global",loc:"Washington / Global",         fn:"investing",  sector:"sovereign", status:"watch",   deadline:"2027-02-01", dlnote:"Typically Jan–Feb each year",   fit:5, tags:["Impact Investing","DFI","MBA"],           notes:"Development finance LDP. PE/VC + Aavishkaar impact experience is standout fit. CFA Level II also valued.",                                       url:"https://www.ifc.org/en/careers/ypp"},
+  {id:13,name:"Temasek / GIC Graduate Programme",    org:"Temasek/GIC",    geo:"global", loc:"Singapore (Australia pathway)",fn:"investing",  sector:"sovereign", status:"watch",   deadline:"2026-10-01", dlnote:"Opens Sep–Oct annually",        fit:4, tags:["Sovereign Fund","PE/VC","Investments"],   notes:"PE/VC background is strong fit. Also a pathway into Australia market.",                                                                           url:"https://www.temasek.com.sg/en/career"},
+  {id:14,name:"Noon.com Strategy & Ops",             org:"Noon",           geo:"uae",    loc:"Dubai, UAE",                  fn:"operations", sector:"tech",      status:"rolling", deadline:"",           dlnote:"Rolling — LinkedIn-driven",     fit:4, tags:["E-commerce","Quick Commerce","Ops"],      notes:"Open Secret / Blinkit quick commerce work is directly relevant. Strong ops + strategy fit.",                                                     url:"https://noon.com/uae-en/careers/"}
+];
+
+// LinkedIn alumni search — these URLs open the school's LinkedIn alumni page with the company name pre-filled in the keyword search
+const DA = [
+  {id:1, name:"[Find via LinkedIn]", school:"esade", firm:"Amazon",            role:"Pathways Operations Manager", loc:"EU / UK",          status:"identified", prog:"Amazon Pathways",        li:"https://www.linkedin.com/school/esade/people/?keywords=amazon",              notes:"Click 'Search LinkedIn →' → log in → the ESADE alumni tool opens filtered by 'amazon'. Target people who joined Amazon in the last 2 years."},
+  {id:2, name:"[Find via LinkedIn]", school:"hec",   firm:"BCG",               role:"Associate / Consultant",      loc:"Dubai / London",   status:"identified", prog:"BCG",                    li:"https://www.linkedin.com/school/hec-paris/people/?keywords=bcg",             notes:"HEC Paris alumni tool filtered by 'bcg'. Filter further by location: Dubai or London."},
+  {id:3, name:"[Find via LinkedIn]", school:"esade", firm:"IFC / World Bank",  role:"Young Professional",          loc:"Washington/Global",status:"identified", prog:"IFC YPP",                li:"https://www.linkedin.com/school/esade/people/?keywords=IFC",                  notes:"Search ESADE alumni at IFC. Your Aavishkaar impact investing background is a strong conversation opener."},
+  {id:4, name:"[Find via LinkedIn]", school:"hec",   firm:"Mubadala",          role:"Investment Associate",         loc:"Abu Dhabi",        status:"identified", prog:"Mubadala Graduate",     li:"https://www.linkedin.com/school/hec-paris/people/?keywords=mubadala",        notes:"HEC Paris has strong MENA alumni. Search HEC + Mubadala. Reach out 6–8 weeks before apps open."},
+  {id:5, name:"[Find via LinkedIn]", school:"esade", firm:"Santander",         role:"Graduate Analyst",             loc:"Madrid / London",  status:"identified", prog:"Santander CIB Graduate",li:"https://www.linkedin.com/school/esade/people/?keywords=santander",           notes:"ESADE has direct pipeline to Santander Spain. Check the ESADE careers office for warm intros too."},
+  {id:6, name:"[Find via LinkedIn]", school:"hec",   firm:"Mastercard",        role:"MBA Leadership Program",       loc:"Dubai / Paris",    status:"identified", prog:"Mastercard MBA LDP",    li:"https://www.linkedin.com/school/hec-paris/people/?keywords=mastercard",      notes:"Search HEC alumni at Mastercard in UAE / Europe. Fintech + strategy angle is a strong thread."},
+  {id:7, name:"[Find via LinkedIn]", school:"esade", firm:"Maersk",            role:"Commercial Graduate",          loc:"Copenhagen / BCN", status:"identified", prog:"Maersk Commercial",     li:"https://www.linkedin.com/school/esade/people/?keywords=maersk",              notes:"Maersk has recruited from ESADE. Target alumni in supply chain or commercial strategy roles."},
+  {id:8, name:"[Find via LinkedIn]", school:"hec",   firm:"Microsoft",         role:"Aspire Experience MBA",        loc:"Paris/Dublin/Dubai",status:"identified",prog:"Microsoft Aspire",      li:"https://www.linkedin.com/school/hec-paris/people/?keywords=microsoft",       notes:"HEC has strong placement at Microsoft Europe. Look for people who started in the last 2 years."}
+];
+
+// ====== STATE ======
+let progs = JSON.parse(localStorage.getItem('ldp_progs') || 'null') || DP;
+let alum  = JSON.parse(localStorage.getItem('ldp_alum')  || 'null') || DA;
+let apps  = JSON.parse(localStorage.getItem('ldp_apps')  || '[]');
+let eId   = {prog:null, alumni:null, app:null};
+let F     = {geo:'all', fn:'all', st:'all', asc:'all'};
+
+function persist() {
+  localStorage.setItem('ldp_progs', JSON.stringify(progs));
+  localStorage.setItem('ldp_alum',  JSON.stringify(alum));
+  localStorage.setItem('ldp_apps',  JSON.stringify(apps));
+}
+
+// ====== NAV ======
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>{ if(t.textContent.trim().toLowerCase().startsWith(id.slice(0,4))) t.classList.add('active'); });
+  ({programs:renderPrograms, alumni:renderAlumni, applications:renderApplications, deadlines:renderDeadlines})[id]?.();
+}
+
+// ====== FILTER SETTER (single function, no selector clash) ======
+function setF(dim, btn) {
+  F[dim] = btn.dataset[dim] || btn.getAttribute('data-'+dim);
+  // only clear pills with same data attribute
+  document.querySelectorAll('[data-'+dim+']').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  dim==='asc' ? renderAlumni() : renderPrograms();
+}
+
+// ====== RENDER PROGRAMS ======
+function renderPrograms() {
+  const q = (document.getElementById('prog-search')||{}).value?.toLowerCase()||'';
+  const list = progs.filter(p=>{
+    if(F.geo!=='all' && p.geo!==F.geo) return false;
+    if(F.fn !=='all' && p.fn !==F.fn)  return false;
+    if(F.st !=='all' && p.status!==F.st) return false;
+    if(q && !p.name.toLowerCase().includes(q) && !p.org.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const sm={open:['b-open','Open now'],rolling:['b-rolling','Rolling'],watch:['b-watch','Watch'],closed:['b-closed','Closed']};
+  const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+  document.getElementById('prog-list').innerHTML = list.length===0
+    ? '<div class="empty">No programs match your current filters.</div>'
+    : list.map(p=>{
+        const [bc,bl]=(sm[p.status]||['b-closed','—']);
+        const dl=p.deadline ? new Date(p.deadline).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : (p.dlnote||'—');
+        return `<div class="prow">
+          <div><div class="pname">${p.name}</div><div class="porg">${p.org}</div>
+            ${p.url?`<a class="plink" href="${p.url}" target="_blank" rel="noopener noreferrer">Visit careers page ↗</a>`:''}
+            <div class="tags">${(p.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>
+          <div class="cell">${cap(p.fn)} · ${cap(p.sector)}</div>
+          <div class="cell">${p.loc||p.geo}</div>
+          <div class="cell mono">${dl}</div>
+          <div><span class="badge ${bc}">${bl}</span></div>
+          <div class="stars">${stars(+p.fit||3)}</div>
+          <div class="abts"><button class="bsm" onclick="editP(${p.id})">Edit</button><button class="bsm del" onclick="delP(${p.id})">Del</button></div>
+        </div>`;
+      }).join('');
+  document.getElementById('prog-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${progs.length}</div><div class="stat-lbl">Total tracked</div></div>
+    <div class="stat-card"><div class="stat-num cg">${progs.filter(p=>p.status==='open').length}</div><div class="stat-lbl">Open now</div></div>
+    <div class="stat-card"><div class="stat-num cb">${progs.filter(p=>p.status==='rolling').length}</div><div class="stat-lbl">Rolling</div></div>
+    <div class="stat-card"><div class="stat-num ca">${progs.filter(p=>p.status==='watch').length}</div><div class="stat-lbl">Watch / prep</div></div>
+    <div class="stat-card"><div class="stat-num cc">${progs.filter(p=>+p.fit>=4).length}</div><div class="stat-lbl">★★★★+ fit</div></div>`;
+}
+
+// ====== RENDER ALUMNI ======
+function renderAlumni() {
+  const q=(document.getElementById('alumni-search')||{}).value?.toLowerCase()||'';
+  const list=alum.filter(a=>{
+    if(F.asc!=='all' && a.school!==F.asc && a.school!=='both') return false;
+    if(q && !a.name.toLowerCase().includes(q) && !a.firm.toLowerCase().includes(q) && !(a.prog||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const smap={identified:['c-id','Identified'],reached:['c-rc','Reached out'],replied:['c-rp','Replied ✓'],coffee:['c-cf','Coffee chat ☕'],referred:['c-rf','Referred 🌟']};
+  const avc=['#1a4fa8','#b33a1a','#1a6b3a','#5a3a9a','#0d6b6b'];
+  const ini=n=>n.replace(/[\[\]]/g,'').split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase()||'?';
+  const sbadge=s=>{
+    if(s==='both') return `<span class="stag esade">ESADE</span> <span class="stag hec">HEC Paris</span>`;
+    return s==='hec'?`<span class="stag hec">HEC Paris</span>`:`<span class="stag esade">ESADE</span>`;
+  };
+  document.getElementById('alumni-list').innerHTML = list.length===0
+    ? '<div class="empty" style="grid-column:1/-1">No contacts yet. Use the LinkedIn links to find alumni, then add them here.</div>'
+    : list.map((a,i)=>{
+        const [sc,sl]=(smap[a.status]||['c-id','Identified']);
+        return `<div class="acard">
+          <div class="ahead">
+            <div class="avatar" style="background:${avc[i%5]}18;color:${avc[i%5]};border:1px solid ${avc[i%5]}30">${ini(a.name)}</div>
+            <div><div class="aname">${a.name}</div><div class="arole">${a.role} · <strong>${a.firm}</strong></div></div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px">${sbadge(a.school)}<span class="cs ${sc}">${sl}</span></div>
+          ${a.loc?`<div style="font-size:11px;color:var(--text3);margin-bottom:3px">📍 ${a.loc}${a.prog?' · '+a.prog:''}</div>`:''}
+          ${a.notes?`<div class="anotes">${a.notes}</div>`:''}
+          <div class="afoot">
+            ${a.li?`<a class="li-btn" href="${a.li}" target="_blank" rel="noopener noreferrer">Search LinkedIn →</a>`:''}
+            <button class="gbtn" onclick="editA(${a.id})">Edit</button>
+            <button class="gbtn" style="color:var(--red)" onclick="delA(${a.id})">Remove</button>
+          </div>
+        </div>`;
+      }).join('');
+}
+
+// ====== RENDER APPLICATIONS ======
+function renderApplications() {
+  const q=(document.getElementById('app-search')||{}).value?.toLowerCase()||'';
+  const fa=apps.filter(a=>!q||a.name.toLowerCase().includes(q)||(a.org||'').toLowerCase().includes(q));
+  const act=apps.filter(a=>!['offer','rejected'].includes(a.status)).length;
+  document.getElementById('app-sub').textContent=`${act} active application${act!==1?'s':''} · ${apps.length} total`;
+  const stages=[
+    {key:'networking',label:'Networking',   color:'var(--blue)'},
+    {key:'drafting',  label:'Drafting',     color:'var(--purple)'},
+    {key:'applied',   label:'Applied',      color:'var(--amber)'},
+    {key:'interview', label:'Interview',    color:'var(--accent)'},
+    {key:'offer',     label:'Offer 🎉',     color:'var(--teal)'}
+  ];
+  document.getElementById('app-kanban').innerHTML=stages.map(s=>{
+    const cards=fa.filter(a=>a.status===s.key);
+    return `<div class="kcol">
+      <div class="khd" style="color:${s.color}">${s.label}<span class="kct">${cards.length}</span></div>
+      ${cards.length===0?'<div style="font-size:11px;color:var(--text3);text-align:center;padding-top:16px">—</div>':''}
+      ${cards.map(a=>`<div class="apcard" onclick="editAp(${a.id})">
+        <div class="apct">${a.name}</div>
+        <div class="apco">${a.org||''}${a.geo?' · '+a.geo:''}</div>
+        ${a.next?`<div class="apnx">→ ${a.next}</div>`:''}
+        ${a.contact?`<div style="font-size:10px;color:var(--text3);margin-top:4px">👤 ${a.contact}</div>`:''}
+        ${a.deadline?`<div class="apdl">Due: ${new Date(a.deadline).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</div>`:''}
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+// ====== RENDER DEADLINES ======
+function renderDeadlines() {
+  const today=new Date(); today.setHours(0,0,0,0);
+  const items=[
+    ...progs.filter(p=>p.deadline).map(p=>({name:p.name,org:p.org,date:new Date(p.deadline),type:'program'})),
+    ...apps.filter(a=>a.deadline).map(a=>({name:a.name,org:a.org||'',date:new Date(a.deadline),type:'application'}))
+  ].filter(i=>i.date>=today).sort((a,b)=>a.date-b.date);
+  document.getElementById('dl-list').innerHTML=items.length===0
+    ?'<div class="empty">No upcoming deadlines tracked. Add deadline dates to your programs and applications.</div>'
+    :items.map(i=>{
+        const d=Math.round((i.date-today)/86400000);
+        const cls=d<=14?'urg':d<=45?'soon':'ok';
+        const lbl=d===0?'TODAY':d===1?'1 day left':`${d} days`;
+        return `<div class="dlitem">
+          <div class="dldate">${i.date.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+          <div><div class="dlname">${i.name}</div><div class="dlorg">${i.org}</div></div>
+          <span class="dltype">${i.type}</span>
+          <div class="dldays ${cls}">${lbl}</div>
+        </div>`;
+      }).join('');
+}
+
+// ====== MODALS ======
+function openM(type,data={}) {
+  eId[type==='prog'?'prog':type==='alumni'?'alumni':'app']=data.id||null;
+  if(type==='prog'){
+    sv('pi-name',data.name||''); sv('pi-org',data.org||''); sv('pi-url',data.url||'');
+    sv('pi-geo',data.geo||'europe'); sv('pi-loc',data.loc||''); sv('pi-fn',data.fn||'strategy');
+    sv('pi-sector',data.sector||'other'); sv('pi-status',data.status||'watch');
+    sv('pi-deadline',data.deadline||''); sv('pi-dlnote',data.dlnote||'');
+    sv('pi-fit',data.fit||'4'); sv('pi-notes',data.notes||'');
+    sv('pi-tags',(data.tags||[]).join(', '));
+  }
+  if(type==='alumni'){
+    sv('ai-name',data.name||''); sv('ai-school',data.school||'esade');
+    sv('ai-firm',data.firm||''); sv('ai-role',data.role||''); sv('ai-li',data.li||'');
+    sv('ai-prog',data.prog||''); sv('ai-loc',data.loc||''); sv('ai-status',data.status||'identified');
+    sv('ai-notes',data.notes||'');
+  }
+  if(type==='app'){
+    sv('aps-name',data.name||''); sv('aps-org',data.org||''); sv('aps-geo',data.geo||'');
+    sv('aps-status',data.status||'networking');
+    sv('aps-date',data.date||new Date().toISOString().split('T')[0]);
+    sv('aps-deadline',data.deadline||''); sv('aps-next',data.next||'');
+    sv('aps-contact',data.contact||''); sv('aps-notes',data.notes||'');
+  }
+  document.getElementById('ov-'+type).classList.add('open');
+}
+function closeM(type){document.getElementById('ov-'+type).classList.remove('open');}
+function sv(id,val){const e=document.getElementById(id);if(e)e.value=val;}
+
+// ====== SAVE ======
+function saveProg(){
+  const p={id:eId.prog||Date.now(),name:gv('pi-name'),org:gv('pi-org'),url:gv('pi-url'),geo:gv('pi-geo'),
+    loc:gv('pi-loc'),fn:gv('pi-fn'),sector:gv('pi-sector'),status:gv('pi-status'),
+    deadline:gv('pi-deadline'),dlnote:gv('pi-dlnote'),fit:gv('pi-fit'),notes:gv('pi-notes'),
+    tags:gv('pi-tags').split(',').map(t=>t.trim()).filter(Boolean)};
+  if(!p.name){alert('Program name required.');return;}
+  if(eId.prog){const i=progs.findIndex(x=>x.id===eId.prog);if(i>=0)progs[i]=p;}else progs.push(p);
+  persist();closeM('prog');renderPrograms();toast('Program saved ✓');
+}
+function saveAlumni(){
+  const a={id:eId.alumni||Date.now(),name:gv('ai-name'),school:gv('ai-school'),firm:gv('ai-firm'),
+    role:gv('ai-role'),li:gv('ai-li'),prog:gv('ai-prog'),loc:gv('ai-loc'),status:gv('ai-status'),notes:gv('ai-notes')};
+  if(!a.name){alert('Name required.');return;}
+  if(eId.alumni){const i=alum.findIndex(x=>x.id===eId.alumni);if(i>=0)alum[i]=a;}else alum.push(a);
+  persist();closeM('alumni');renderAlumni();toast('Contact saved ✓');
+}
+function saveApp(){
+  const a={id:eId.app||Date.now(),name:gv('aps-name'),org:gv('aps-org'),geo:gv('aps-geo'),
+    status:gv('aps-status'),date:gv('aps-date'),deadline:gv('aps-deadline'),
+    next:gv('aps-next'),contact:gv('aps-contact'),notes:gv('aps-notes')};
+  if(!a.name){alert('Program/role name required.');return;}
+  if(eId.app){const i=apps.findIndex(x=>x.id===eId.app);if(i>=0)apps[i]=a;}else apps.push(a);
+  persist();closeM('app');renderApplications();toast('Application logged ✓');
+}
+function gv(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+
+// ====== EDIT / DELETE ======
+function editP(id){openM('prog',progs.find(p=>p.id===id)||{});}
+function delP(id){if(confirm('Remove this program?')){progs=progs.filter(p=>p.id!==id);persist();renderPrograms();toast('Removed');}}
+function editA(id){openM('alumni',alum.find(a=>a.id===id)||{});}
+function delA(id){if(confirm('Remove this contact?')){alum=alum.filter(a=>a.id!==id);persist();renderAlumni();toast('Removed');}}
+function editAp(id){openM('app',apps.find(a=>a.id===id)||{});}
+
+// ====== HELPERS ======
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+// ====== INIT ======
+document.getElementById('today-lbl').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+renderPrograms();
+</script>
+</body>
+</html>
